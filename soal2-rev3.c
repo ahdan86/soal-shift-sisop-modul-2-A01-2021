@@ -11,35 +11,36 @@
 #include <time.h>
 
 int main(){
-    // pid_t pid, sid;
-    // pid = fork();
+    pid_t pid, sid;
+    pid = fork();
 
-    // if (pid < 0) {
-    //     exit(EXIT_FAILURE);
-    // }
-    // if (pid > 0) {
-    //     exit(EXIT_SUCCESS);
-    // }
+    if (pid < 0) {
+        exit(EXIT_FAILURE);
+    }
+    if (pid > 0) {
+        exit(EXIT_SUCCESS);
+    }
 
-    // umask(0);
+    umask(0);
 
-    // sid = setsid();
-    // if (sid < 0) {
-    //     exit(EXIT_FAILURE);
-    // }
+    sid = setsid();
+    if (sid < 0) {
+        exit(EXIT_FAILURE);
+    }
 
-    // if ((chdir("/home/erki/Documents/modul2_no2/")) < 0) {
-    //     exit(EXIT_FAILURE);     
-    //    }
+    if ((chdir("/home/erki/Documents/modul2_no2/")) < 0) {
+        exit(EXIT_FAILURE);     
+       }
 
-    // close(STDIN_FILENO);
-    // close(STDOUT_FILENO);
-    // close(STDERR_FILENO);
+    close(STDIN_FILENO);
+    close(STDOUT_FILENO);
+    close(STDERR_FILENO);
 
     int counter = 1;
     int isZipped = 0;
     int isMade = 0;
-    while(counter<=1){
+    int loop = 1;
+    while(loop){
          pid_t child_id;
 
          time_t t = time(NULL);
@@ -57,10 +58,13 @@ int main(){
                   isSixHours = 1;
              else if ( hour == 22 && minute == 22)
                   isBirthday = 1;
+             else if ( hour == 10 && minute == 22)
+                  loop = 0;
          }
          printf ("%d %d - %d %d %d\n", date, month, hour, minute, second);
 
-         if(isSixHours && !isZipped){
+         if(isSixHours && !isMade){
+             isMade = 1;
              child_id = fork();
              if(child_id == 0){
                    char *argv[] = {"mkdir",  "Musyik", NULL};
@@ -82,8 +86,8 @@ int main(){
              }
              while(wait(NULL) != child_id);
 
-             child_id = fork();
-             if(child_id == 0){
+             // child_id = fork();
+             // if(child_id == 0){
                     for(int count=1 ;count<=3;count++){
                          child_id = fork();
                          if(child_id == 0){
@@ -154,9 +158,10 @@ int main(){
                          } 
                          sleep(3);
                     }
-             }
+             // }
          }
          if(isBirthday && !isZipped){
+               isZipped = 1;
                child_id = fork();
                if(child_id == 0){
                     char *argv[] = {"zip", "-r", "Lopyu_Stevany.zip", "FILM", "FOTO", "MUSIK", NULL};
@@ -171,8 +176,6 @@ int main(){
                }
                while (wait(NULL) != child_id);
          }
-         isZipped = 1;
-         isMade = 1;
          counter++;
          sleep(2);
     } 
