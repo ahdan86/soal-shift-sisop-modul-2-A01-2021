@@ -9,32 +9,33 @@
 #include <string.h>
 #include <wait.h>
 #include <time.h>
+#include <dirent.h>
 
 int main(){
-    pid_t pid, sid;
-    pid = fork();
+//     pid_t pid, sid;
+//     pid = fork();
 
-    if (pid < 0) {
-        exit(EXIT_FAILURE);
-    }
-    if (pid > 0) {
-        exit(EXIT_SUCCESS);
-    }
+//     if (pid < 0) {
+//         exit(EXIT_FAILURE);
+//     }
+//     if (pid > 0) {
+//         exit(EXIT_SUCCESS);
+//     }
 
-    umask(0);
+//     umask(0);
 
-    sid = setsid();
-    if (sid < 0) {
-        exit(EXIT_FAILURE);
-    }
+//     sid = setsid();
+//     if (sid < 0) {
+//         exit(EXIT_FAILURE);
+//     }
 
-    if ((chdir("/home/erki/Documents/modul2_no2/")) < 0) {
-        exit(EXIT_FAILURE);     
-       }
+//     if ((chdir("/home/erki/Documents/modul2_no2/")) < 0) {
+//         exit(EXIT_FAILURE);     
+//        }
 
-    close(STDIN_FILENO);
-    close(STDOUT_FILENO);
-    close(STDERR_FILENO);
+//     close(STDIN_FILENO);
+//     close(STDOUT_FILENO);
+//     close(STDERR_FILENO);
 
     int counter = 1;
     int isZipped = 0;
@@ -62,7 +63,7 @@ int main(){
                   loop = 0;
          }
 
-         // printf ("%d %d - %d %d %d\n", date, month, hour, minute, second);  //debug
+         printf ("%d %d - %d %d %d\n", date, month, hour, minute, second);  //debug
 
          if(isSixHours && !isMade){      //condition if it's 6 hours before birthday
              isMade = 1;
@@ -92,16 +93,17 @@ int main(){
                   if(child_id == 0){
                        char directory[100], link[100], nameFile[100];
                        if(count==1){
-                            strcat(link, "https://drive.google.com/uc?id=1ZG8nRBRPquhYXq_sISdsVcXx5VdEgi-J&export=download");
-                            strcat(nameFile, "Musik_for_Stevany.zip");
+                            strcpy(link, "https://drive.google.com/uc?id=1ZG8nRBRPquhYXq_sISdsVcXx5VdEgi-J&export=download");
+                            strcpy(nameFile, "Musik_for_Stevany.zip");
                        }if(count==2){
-                            strcat(link, "https://drive.google.com/uc?id=1ktjGgDkL0nNpY-vT7rT7O6ZI47Ke9xcp&export=download");
-                            strcat(nameFile, "Film_for_Stevany.zip");
+                            strcpy(link, "https://drive.google.com/uc?id=1ktjGgDkL0nNpY-vT7rT7O6ZI47Ke9xcp&export=download");
+                            strcpy(nameFile, "Film_for_Stevany.zip");
                        }if(count==3){
-                            strcat(link, "https://drive.google.com/uc?id=1FsrAzb9B5ixooGUs0dGiBr-rC7TS9wTD&export=download");
-                            strcat(nameFile, "Foto_for_Stevany.zip");
+                            strcpy(link, "https://drive.google.com/uc?id=1FsrAzb9B5ixooGUs0dGiBr-rC7TS9wTD&export=download");
+                            strcpy(nameFile, "Foto_for_Stevany.zip");
                        }
-                       char *argv[] = {"wget", "-q", link, "-O", nameFile, NULL};
+                    //    char *argv[] = {"wget", "-q", link, "-O", nameFile, NULL};
+                       char *argv[] = {"wget",  link, "-O", nameFile, NULL};
                        execv("/usr/bin/wget", argv);  
                   } 
                   sleep(15);
@@ -113,11 +115,11 @@ int main(){
                   if(child_id == 0){
                        char directory[100], link[100], nameFile[100];
                        if(count==1){
-                            strcat(nameFile, "Musik_for_Stevany.zip");
+                            strcpy(nameFile, "Musik_for_Stevany.zip");
                        }if(count==2){
-                            strcat(nameFile, "Film_for_Stevany.zip");
+                            strcpy(nameFile, "Film_for_Stevany.zip");
                        }if(count==3){
-                            strcat(nameFile, "Foto_for_Stevany.zip");
+                            strcpy(nameFile, "Foto_for_Stevany.zip");
                        }
                        char *argv[] = {"unzip", nameFile, NULL};
                        execv("/usr/bin/unzip", argv);
@@ -125,25 +127,61 @@ int main(){
                   sleep(2);
              }
 
+          //    while(wait(NULL) != child_id);
+          //    for(int count=1 ;count<=3;count++){          //copy contents that unzipped
+          //         child_id = fork();
+          //         if(child_id == 0){
+          //              char dest[100], source[100], nameFile[100];
+          //              if(count==1){
+          //                   strcat(source, "/home/erki/Documents/modul2_no2/MUSIK/");
+          //                   strcat(dest, "/home/erki/Documents/modul2_no2/Musyik");
+          //              }if(count==2){
+          //                   strcat(source, "/home/erki/Documents/modul2_no2/FILM/");
+          //                   strcat(dest, "/home/erki/Documents/modul2_no2/Fylm");
+          //              }if(count==3){
+          //                   strcat(source, "/home/erki/Documents/modul2_no2/FOTO/");
+          //                   strcat(dest, "/home/erki/Documents/modul2_no2/Pyoto");
+          //              }
+          //              char *argv[] = {"cp", "-RT", source, dest, NULL};
+          //              execv("/usr/bin/cp", argv);  
+          //         } 
+          //         sleep(3);
+          //    }
+
              while(wait(NULL) != child_id);
              for(int count=1 ;count<=3;count++){          //copy contents that unzipped
-                  child_id = fork();
-                  if(child_id == 0){
-                       char dest[100], source[100], nameFile[100];
-                       if(count==1){
-                            strcat(source, "/home/erki/Documents/modul2_no2/MUSIK/");
-                            strcat(dest, "/home/erki/Documents/modul2_no2/Musyik");
-                       }if(count==2){
-                            strcat(source, "/home/erki/Documents/modul2_no2/FILM/");
-                            strcat(dest, "/home/erki/Documents/modul2_no2/Fylm");
-                       }if(count==3){
-                            strcat(source, "/home/erki/Documents/modul2_no2/FOTO/");
-                            strcat(dest, "/home/erki/Documents/modul2_no2/Pyoto");
+                  DIR *dp;
+                  struct dirent* ep;
+
+                  char dest[100], source[100], nameFile[100];
+                  if(count==1){
+                         strcpy(source, "/home/erki/Documents/modul2_no2/MUSIK/");
+                         strcpy(dest, "/home/erki/Documents/modul2_no2/Musyik/");
+                  }if(count==2){
+                         strcpy(source, "/home/erki/Documents/modul2_no2/FILM/");
+                         strcpy(dest, "/home/erki/Documents/modul2_no2/Fylm/");
+                  }if(count==3){
+                         strcpy(source, "/home/erki/Documents/modul2_no2/FOTO/");
+                         strcpy(dest, "/home/erki/Documents/modul2_no2/Pyoto/");
+                  }
+                  dp = opendir(source);
+                  if(dp != NULL){
+                       while((ep = readdir(dp))){
+                         child_id = fork();
+                         if(child_id == 0){
+                              printf("DEBUG %s\n", ep->d_name);
+                              char file_source[355];
+                              char file_dest[355];
+                              sprintf(file_source, "%s%s", source, ep->d_name);
+                              sprintf(file_dest, "%s%s", dest, ep->d_name);
+
+                              if(strcmp(ep->d_name, ".") != 0 || strcmp(ep->d_name, "..") != 0){
+                                   char *argv[] = {"mv", file_source, file_dest, NULL};
+                                   execv("/usr/bin/mv", argv);  
+                              }
+                         }
                        }
-                       char *argv[] = {"cp", "-RT", source, dest, NULL};
-                       execv("/usr/bin/cp", argv);  
-                  } 
-                  sleep(3);
+                  }
              }
          }
 
