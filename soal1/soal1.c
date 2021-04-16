@@ -12,30 +12,30 @@
 #include <dirent.h>
 
 int main(){
-//     pid_t pid, sid;
-//     pid = fork();
+    pid_t pid, sid;
+    pid = fork();
 
-//     if (pid < 0) {
-//         exit(EXIT_FAILURE);
-//     }
-//     if (pid > 0) {
-//         exit(EXIT_SUCCESS);
-//     }
+    if (pid < 0) {
+        exit(EXIT_FAILURE);
+    }
+    if (pid > 0) {
+        exit(EXIT_SUCCESS);
+    }
 
-//     umask(0);
+    umask(0);
 
-//     sid = setsid();
-//     if (sid < 0) {
-//         exit(EXIT_FAILURE);
-//     }
+    sid = setsid();
+    if (sid < 0) {
+        exit(EXIT_FAILURE);
+    }
 
-//     if ((chdir("/home/erki/Documents/modul2_no2/")) < 0) {
-//         exit(EXIT_FAILURE);     
-//        }
+    if ((chdir("/home/erki/Documents/modul2_no2/")) < 0) {
+        exit(EXIT_FAILURE);     
+       }
 
-//     close(STDIN_FILENO);
-//     close(STDOUT_FILENO);
-//     close(STDERR_FILENO);
+    close(STDIN_FILENO);
+    close(STDOUT_FILENO);
+    close(STDERR_FILENO);
 
     int counter = 1;
     int isZipped = 0;
@@ -63,7 +63,7 @@ int main(){
                   loop = 0;
          }
 
-         printf ("%d %d - %d %d %d\n", date, month, hour, minute, second);  //debug
+     //     printf ("%d %d - %d %d %d\n", date, month, hour, minute, second);  //debug
 
          if(isSixHours && !isMade){      //condition if it's 6 hours before birthday
              isMade = 1;
@@ -102,8 +102,8 @@ int main(){
                             strcpy(link, "https://drive.google.com/uc?id=1FsrAzb9B5ixooGUs0dGiBr-rC7TS9wTD&export=download");
                             strcpy(nameFile, "Foto_for_Stevany.zip");
                        }
-                    //    char *argv[] = {"wget", "-q", link, "-O", nameFile, NULL};
-                       char *argv[] = {"wget",  link, "-O", nameFile, NULL};
+                       char *argv[] = {"wget", "-q", link, "-O", nameFile, NULL};
+                    //    char *argv[] = {"wget",  link, "-O", nameFile, NULL};
                        execv("/usr/bin/wget", argv);  
                   } 
                   sleep(15);
@@ -127,27 +127,6 @@ int main(){
                   sleep(2);
              }
 
-          //    while(wait(NULL) != child_id);
-          //    for(int count=1 ;count<=3;count++){          //copy contents that unzipped
-          //         child_id = fork();
-          //         if(child_id == 0){
-          //              char dest[100], source[100], nameFile[100];
-          //              if(count==1){
-          //                   strcat(source, "/home/erki/Documents/modul2_no2/MUSIK/");
-          //                   strcat(dest, "/home/erki/Documents/modul2_no2/Musyik");
-          //              }if(count==2){
-          //                   strcat(source, "/home/erki/Documents/modul2_no2/FILM/");
-          //                   strcat(dest, "/home/erki/Documents/modul2_no2/Fylm");
-          //              }if(count==3){
-          //                   strcat(source, "/home/erki/Documents/modul2_no2/FOTO/");
-          //                   strcat(dest, "/home/erki/Documents/modul2_no2/Pyoto");
-          //              }
-          //              char *argv[] = {"cp", "-RT", source, dest, NULL};
-          //              execv("/usr/bin/cp", argv);  
-          //         } 
-          //         sleep(3);
-          //    }
-
              while(wait(NULL) != child_id);
              for(int count=1 ;count<=3;count++){          //copy contents that unzipped
                   DIR *dp;
@@ -169,7 +148,7 @@ int main(){
                        while((ep = readdir(dp))){
                          child_id = fork();
                          if(child_id == 0){
-                              printf("DEBUG %s\n", ep->d_name);
+                              // printf("DEBUG %s\n", ep->d_name); // debug print file
                               char file_source[355];
                               char file_dest[355];
                               sprintf(file_source, "%s%s", source, ep->d_name);
