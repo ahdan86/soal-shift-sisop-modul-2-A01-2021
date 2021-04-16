@@ -154,7 +154,7 @@ int main(){
                               sprintf(file_source, "%s%s", source, ep->d_name);
                               sprintf(file_dest, "%s%s", dest, ep->d_name);
 
-                              if(strcmp(ep->d_name, ".") != 0 || strcmp(ep->d_name, "..") != 0){
+                              if(strcmp(ep->d_name, ".") != 0 || strcmp(ep->d_name, "..") != 0){ //dont print current and parrent directory
                                    char *argv[] = {"mv", file_source, file_dest, NULL};
                                    execv("/usr/bin/mv", argv);  
                               }
