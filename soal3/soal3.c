@@ -130,6 +130,11 @@ void fungsiMain(int pilihan)
 {
     if(pilihan == 0) {
         strcpy(isiBashX, "#!/bin/sh\nrm -f Killer.sh\nkill -9");
+        int pid = (int)getpid();
+        char strPid[10];
+        sprintf(strPid, "%d", pid);
+        strcat(isiBashX," ");
+        strcat(isiBashX,strPid);
         makeKillerX();
     }
     else if(pilihan == 1) makeKillerZ();
@@ -137,15 +142,6 @@ void fungsiMain(int pilihan)
     pid_t child1;
 
     while(1){
-        //Get PID
-        if(pilihan == 0){
-            int pid = (int)getpid();
-            char strPid[10];
-            sprintf(strPid, "%d", pid);
-            strcat(isiBashX," ");
-            strcat(isiBashX,strPid);
-            makeKillerX();
-        }
         
         //PathFolder
         char namaTime[50];
