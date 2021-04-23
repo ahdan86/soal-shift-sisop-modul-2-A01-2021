@@ -254,3 +254,12 @@ while (wait(NULL) != child_id);
 ```
 
 option `-r` digunakan untuk menghapus directory bersama dengan semua file yang terdapat di dalamnya.
+
+### Screenshot folder sebelum set waktu 6 jam dari waktu ulang tahun Stevany
+![image](soal1/soal1a-d_before_16-22.jpg)
+
+### Screenshot folder saat set waktu 6 jam dari waktu ulang tahun Stevany
+![image](soal1/soal1a-d_on_16-22.jpg)
+
+### Screenshot folder saat ulang tahun Stevany
+![image](soal1/soal1e-f_on_22-22.jpg)
