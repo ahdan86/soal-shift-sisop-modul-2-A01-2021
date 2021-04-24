@@ -547,6 +547,14 @@ int main(int argc, char *argv[])
 }
 ```
 ### Dokumentasi Soal 3
+#### Membuat folder dan program killer (Dengan isi program killer seperti digambar)
+![soal3ss1](soal3/soal3ss1.png)
+#### Mendownload gambar tiap 5 detik
+![soal3ss2](soal3/soal3ss2.png)
+#### Membuat folder baru tiap 40 detik (Saat download foto ke-9)
+![soal3ss3](soal3/soal3ss3.png)
+#### Membuat zip dan menghapus original folder
+![soal3ss5](soal3/soal3ss5.png)
 
 
 
