@@ -263,3 +263,291 @@ option `-r` digunakan untuk menghapus directory bersama dengan semua file yang t
 
 ### Screenshot folder saat ulang tahun Stevany
 ![image](soal1/soal1e-f_on_22-22.jpg)
+
+## Soal Nomor 3
+Ranora adalah mahasiswa Teknik Informatika yang saat ini sedang menjalani magang di perusahan ternama yang bernama “FakeKos Corp.”, perusahaan yang bergerak dibidang keamanan data. Karena Ranora masih magang, maka beban tugasnya tidak sebesar beban tugas pekerja tetap perusahaan. Di hari pertama Ranora bekerja, pembimbing magang Ranora memberi tugas pertamanya untuk membuat sebuah program.
+
+**a.** Ranora harus membuat sebuah program C yang dimana setiap 40 detik membuat sebuah direktori dengan nama sesuai timestamp [YYYY-mm-dd_HH:ii:ss].
+
+**b.** Setiap direktori yang sudah dibuat diisi dengan 10 gambar yang didownload dari https://picsum.photos/, dimana setiap gambar akan didownload setiap 5 detik. Setiap gambar yang didownload akan diberi nama dengan format timestamp [YYYY-mm-dd_HH:ii:ss] dan gambar tersebut berbentuk persegi dengan ukuran (n%1000) + 50 pixel dimana n adalah detik Epoch Unix.
+
+**c.** Setelah direktori telah terisi dengan 10 gambar, program tersebut akan membuat sebuah file “status.txt”, dimana didalamnya berisi pesan “Download Success” yang terenkripsi dengan teknik Caesar Cipher dan dengan shift 5. Caesar Cipher adalah Teknik enkripsi sederhana yang dimana dapat melakukan enkripsi string sesuai dengan shift/key yang kita tentukan. Misal huruf “A” akan dienkripsi dengan shift 4 maka akan menjadi “E”. Karena Ranora orangnya perfeksionis dan rapi, dia ingin setelah file tersebut dibuat, direktori akan di zip dan direktori akan didelete, sehingga menyisakan hanya file zip saja.
+
+**d.** Untuk mempermudah pengendalian program, pembimbing magang Ranora ingin program tersebut akan men-generate sebuah program “Killer” yang executable, dimana program tersebut akan menterminasi semua proses program yang sedang berjalan dan akan menghapus dirinya sendiri setelah program dijalankan. Karena Ranora menyukai sesuatu hal yang baru, maka Ranora memiliki ide untuk program “Killer” yang dibuat nantinya harus merupakan program bash.
+
+**e.** Pembimbing magang Ranora juga ingin nantinya program utama yang dibuat Ranora dapat dijalankan di dalam dua mode. Untuk mengaktifkan mode pertama, program harus dijalankan dsdengan argumen -z, dan Ketika dijalankan dalam mode pertama, program utama akan langsung menghentikan semua operasinya Ketika program Killer dijalankan. Sedangkan untuk mengaktifkan mode kedua, program harus dijalankan dengan argumen -x, dan Ketika dijalankan dalam mode kedua, program utama akan berhenti namun membiarkan proses di setiap direktori yang masih berjalan hingga selesai (Direktori yang sudah dibuat akan mendownload gambar sampai selesai dan membuat file txt, lalu zip dan delete direktori).
+
+### Jawaban 3a
+Dalam soal 3a disuruh untuk membuat directory dalam waktu 40 detik sekali oleh karena itu dibuat lah fungsi untuk membuat directory dimana di fungsi tersebut ada perintah `execv()` untuk mengeksekusi di dalam process. Karena perintah `execv()` akan menggantikan proses yang sedang berjalan maka harus dilakukan `spawn process` terlebih dahulu. Berikut kodingan untuk membuat directory selama 40 detik sekali:
+
+Fungsi utama:
+```c
+pid_t child1;
+while(1){
+        
+        //PathFolder (Tempat dimana directory/folder akan dibuat)
+        char namaTime[50];
+        getTime(namaTime);
+        char str[100] = "/home/ahdan/Modul2/";
+
+        //Path Awal (Untuk keperluan nantinya)
+        char root[100];
+        strcpy(root, str);
+        
+        strcat(str, namaTime);
+        
+        if((child1 = fork()) == 0){
+            makeDirectory(str);
+        }
+        sleep(40);
+    }
+```
+Fungsi `makeDirectory()`:
+```c
+void makeDirectory(char str[])
+{
+    //Make Folder
+    char *argv1[] = {"mkdir", "-m", "777", str, NULL};
+    execv("/usr/bin/mkdir",argv1);
+}
+```
+Fungsi `getTime()` (untuk mendapatkan time stamp):
+```c
+void getTime(char namaFile[])
+{
+    time_t rawtime;
+    char temp[80];
+    struct tm *info;
+    time(&rawtime);
+    info = localtime(&rawtime);
+    strftime(temp, 80, "%Y-%m-%d_%H:%M:%S", info);
+    strcpy(namaFile, temp);
+}
+```
+### Jawaban 3b
+Dalam soal 3b disuruh untuk mendownload 10 gambar dengan dengan tiap gambarnya didownload dengan jeda 5 detik. Agar bisa overlap dengan pembuatan directory (pembuatan directory 40 detik sekali) maka dibuat process terpisah untuk mendownload gambar agar proses memungkinkan secara simultan. untuk mendownload gambar, pertama menentukan sizenya terlebih dahulu. Size diperoleh dengan epochtime % 1000 +50 (Dapat diperoleh dengan perintah `((int)time(NULL) % 1000)+ 50`). Karena didownload 10 kali dan untuk mendownload gambar memerlukan perintah `execv()` untuk menjalankan wget, maka dibuatlah iterasi 10 kali dan setiap iterasi tersebut membuat process baru karena nantinya tiap iterasi process tersebut pasti diterminasi.
+
+Fungsi Utama:
+```c
+pid_t child1;
+while(1){
+        
+        //PathFolder
+        char namaTime[50];
+        getTime(namaTime);
+        char str[100] = "/home/ahdan/Modul2/";
+
+        //Path Awal
+        char root[100];
+        strcpy(root, str);
+        
+        strcat(str, namaTime);
+        
+        if((child1 = fork()) == 0){
+            makeDirectory(str);
+        }
+
+        while(opendir(str) == NULL);
+
+        if((child1 = fork()) == 0){
+            downloadPicture(str);
+        }
+        sleep(40);
+    }
+```
+Fungsi `downloadPicture()`:
+```c
+void downloadPicture(char str[])
+{
+    char changeDir[100];
+    strcpy(changeDir,str);
+    strcat(changeDir,"/");
+    chdir(changeDir);
+
+    printf("%s",changeDir);
+    
+    //Create Download Image Link
+    char link[100];
+    strcpy(link,"https://picsum.photos/");
+    int size = ((int)time(NULL) % 1000)+ 50;                
+    char epochTime[20];
+    sprintf(epochTime,"%d",size);
+    strcat(link, epochTime);
+    
+    pid_t child2;
+    int count=0;
+    while(count<10){
+        child2 = fork();
+            
+        if(child2<0){
+            exit(EXIT_FAILURE);
+        }
+
+        if(child2 == 0){
+            char namaFile[100];
+            getTime(namaFile);
+            strcat(namaFile,".jpg");
+
+            char *argv[] = {"wget", "-q", "-O", namaFile, link, NULL};
+            execv("/usr/bin/wget", argv);
+        }
+        count++;
+        if(count!=9) sleep(5);
+    }
+}
+```
+### Jawaban 3c
+Dalam soal 3c disuruh untuk membuat status.txt setelah download picture selesai dengan isi "Download Success" namun dienkripsi dengan teknik caesar cipher dengan shift 5. Lalu dalam soal ini disuruh untuk menaruh directory ke zip dan menghapus directory yang sudah dibuat. Untuk menghapus directory bisa menggunakan perintah `zip -r` nanti diargumen `execv()`. Berikut kodingannya:
+Fungsi Utama:
+```c
+pid_t child1;
+
+while(1)
+{
+    //PathFolder
+    char namaTime[50];
+    getTime(namaTime);
+    char str[100] = "/home/ahdan/Modul2/";
+
+    //Path Awal
+    char root[100];
+    strcpy(root, str);
+        
+    strcat(str, namaTime);
+        
+    if((child1 = fork()) == 0){
+        makeDirectory(str);
+    }
+
+    while(opendir(str) == NULL);
+
+    if((child1 = fork()) == 0){
+        downloadPicture(str);
+        checkSuccess();
+        zipFolder(namaTime,root);
+    }
+    sleep(40);
+}
+```
+Fungsi `checkSucess()`:
+```c
+void checkSuccess()
+{
+    char checkDownload[20] = "Download Success";
+    caesarCipher(checkDownload);
+    FILE *new = fopen("status.txt","w");
+    fputs(checkDownload, new);
+    fclose(new);
+}
+```
+Fungsi `zipFolder()`:
+```c
+void zipFolder(char namaTime[], char root[]){
+    chdir(root);
+    char *argv2[] = {"zip", "-m", "-q", "-r", namaTime, namaTime, NULL};
+    execv("/usr/bin/zip",argv2);
+}
+```
+### Jawaban 3d
+Dalam soal ini disuruh untuk membuat program killer dimana apabila program tersebut dijalankan maka akan menghentikan smeua process yang sedang berjalan lalu menghapus program killer itu sendiri. Untuk melakukan hal- hal yang telah disebutkan maka dibuatlah program bash seperti berikut:
+```bash
+#!/bin/sh
+rm -f Killer.sh
+pkill -f soal3
+```
+fungsi `pkill()` digunakan untuk membunuh semua process yang dihasilkan oleh eksekusi program`soal3` lalu program killer sendiri akan dihapus oleh perintah `rm -f Killer.sh`. Namun karena menggenerate program bash tersebut harus melalui program c utama, maka di program utama diberilah kodingan berikut:
+```c
+void makeKiller(){
+    char isiBash[100];
+    strcpy(isiBashZ, "#!/bin/sh\nrm -f Killer.sh\npkill -f soal3");
+    FILE *killer = fopen("Killer.sh","w");
+    fputs(isiBashZ, killer);
+    fclose(killer);
+}
+```
+### Jawaban 3e
+Dalam soal ini disuruh untuk membuat program utama bisa dijankan dalam dua mode yaitu `-x` dan `-z`. Jika `-x` program akan dijalankan lalu menggenertae program killer yang saat program killer itu dijalankan akan menghentikan proses utama namun tetap membiarkan process yang berjalan di directory tetap berjalan. Jika diberi argumen `-z` maka program akan menghentikan semua process yang (seperti soal 3d). Kodingannya seperti berikut:
+```c
+void makeKillerZ(){
+    //Generate Killer Program "-z" Argument
+    char isiBashZ[100];
+    // sprintf(isiBash,"#!/bin/sh\nrm -f killer.sh\nkill -9 %d",(int)getpid());
+    strcpy(isiBashZ, "#!/bin/sh\nrm -f Killer.sh\npkill -f soal3");
+    FILE *killer = fopen("Killer.sh","w");
+    fputs(isiBashZ, killer);
+    fclose(killer);
+}
+
+char isiBashX[100];
+void makeKillerX(){
+    // Generate Killer Program "-x" Argument;
+    FILE *killer = fopen("Killer.sh","w");
+    fputs(isiBashX, killer);
+    fclose(killer);
+}
+
+void fungsiMain(int pilihan)
+{
+    if(pilihan == 0) {
+        strcpy(isiBashX, "#!/bin/sh\nrm -f Killer.sh\nkill -9");
+        int pid = (int)getpid();
+        char strPid[10];
+        sprintf(strPid, "%d", pid);
+        strcat(isiBashX," ");
+        strcat(isiBashX,strPid);
+        makeKillerX();
+    }
+    else if(pilihan == 1) makeKillerZ();
+    
+    pid_t child1;
+
+    while(1){
+        
+        //PathFolder
+        char namaTime[50];
+        getTime(namaTime);
+        char str[100] = "/home/ahdan/Modul2/";
+
+        //Path Awal
+        char root[100];
+        strcpy(root, str);
+        
+        strcat(str, namaTime);
+        
+        if((child1 = fork()) == 0){
+            makeDirectory(str);
+        }
+
+        while(opendir(str) == NULL);
+
+        if((child1 = fork()) == 0){
+            downloadPicture(str);
+            checkSuccess();
+            zipFolder(namaTime,root);
+        }
+        sleep(40);
+    }
+}
+
+int main(int argc, char *argv[])
+{
+    if (argc == 1){
+        fungsiMain(1);
+    }
+    
+    else if(argc == 2){
+        if(!strcmp(argv[1],"-x")) fungsiMain(0);
+        else if(!strcmp(argv[1],"-z")) fungsiMain(1);
+    }
+    
+    else{
+        printf("Argument amount is 1 or 0(default -z) only");
+        return(0);
+    }
+}
+```
+### Dokumentasi Soal 3
+
+
+
+
