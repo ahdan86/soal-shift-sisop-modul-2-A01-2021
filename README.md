@@ -547,7 +547,7 @@ int main(int argc, char *argv[])
 }
 ```
 ### Dokumentasi Soal 3
-#### Membuat folder dan program killer (Dengan isi program killer seperti digambar)
+#### Membuat folder dan program killer argumen -z (Dengan isi program killer seperti digambar)
 ![soal3ss1](soal3/soal3ss1.png)
 #### Mendownload gambar tiap 5 detik
 ![soal3ss2](soal3/soal3ss2.png)
@@ -555,6 +555,14 @@ int main(int argc, char *argv[])
 ![soal3ss3](soal3/soal3ss3.png)
 #### Membuat zip dan menghapus original folder
 ![soal3ss5](soal3/soal3ss5.png)
+#### Menjalankan program dengan argumen killer -x (Dengan isi program killer seperti digambar)
+![soal3ss6](soal3/soal3ss6.png)
+
+#### Kendala Soal:
+- Saat Pengerjaan terkendala dalam membuat process (terdapat kesalahan seperti tidak mengterminate child process sehingga terus berjalan seperti mendownload gambar).
+- Tracking process yang masih berjalan sehingga muncul masalah seperti muncul `directory not found` (process tidak tertata dengan rapi atau process sebelumnya belum diterminate dsb).
+- Sebelumnya belum diatur ke beberapa fungsi sehingga kesulitan sendiri membaca alur kodingan yang telah dibuat.
+- Jika spawning process tidak dapat ditrack dengan debugger vscode sehingga harus mengkira-kira apa yang salah. 
 
 
 
