@@ -402,13 +402,13 @@ char content[200];
  ```
  
 ### Screenshot dari nomor 2
-Hasil Unzip:
+####Hasil Unzip:
 ![image](https://user-images.githubusercontent.com/81211647/115994918-3046ef80-a603-11eb-9749-48fd7b703069.png)
-Hasil membuat direktori berdasarkan nama jenis:
+####Hasil membuat direktori berdasarkan nama jenis:
 ![image](https://user-images.githubusercontent.com/81211647/115994945-4ce32780-a603-11eb-86bd-61e47976ca55.png)
-Hasil memindah file unzip ke tiap file folder per nama jenis serta penamaan file gambat diubah berdasarkan nama hewan:
+####Hasil memindah file unzip ke tiap file folder per nama jenis serta penamaan file gambat diubah berdasarkan nama hewan:
 ![image](https://user-images.githubusercontent.com/81211647/115994962-713f0400-a603-11eb-86e4-0cc0d8a0809c.png)
-Isi dari file keterangan.txt:
+####Isi dari file keterangan.txt:
 ![image](https://user-images.githubusercontent.com/81211647/115994981-874cc480-a603-11eb-83f9-1849680fd351.png)
 
 ## Soal Nomor 3
