@@ -264,6 +264,142 @@ option `-r` digunakan untuk menghapus directory bersama dengan semua file yang t
 ### Screenshot folder saat ulang tahun Stevany
 ![image](soal1/soal1e-f_on_22-22.jpg)
 
+## Soal nomor 2
+Loba bekerja di sebuah petshop terkenal, suatu saat dia mendapatkan zip yang berisi banyak sekali foto peliharaan dan Ia diperintahkan untuk mengkategorikan foto-foto peliharaan tersebut. Loba merasa kesusahan melakukan pekerjaanya secara manual, apalagi ada kemungkinan ia akan diperintahkan untuk melakukan hal yang sama. Kamu adalah teman baik Loba dan Ia meminta bantuanmu untuk membantu pekerjaannya.
+
+**a.** Pertama-tama program perlu mengextract zip yang diberikan ke dalam folder “/home/[user]/modul2/petshop”. Karena bos Loba teledor, dalam zip tersebut bisa berisi folder-folder yang tidak penting, maka program harus bisa membedakan file dan folder sehingga dapat memproses file yang seharusnya dikerjakan dan menghapus folder-folder yang tidak dibutuhkan.
+**b.** Foto peliharaan perlu dikategorikan sesuai jenis peliharaan, maka kamu harus membuat folder untuk setiap jenis peliharaan yang ada dalam zip. Karena kamu tidak mungkin memeriksa satu-persatu, maka program harus membuatkan folder-folder yang dibutuhkan sesuai dengan isi zip.
+```
+Contoh: Jenis peliharaan kucing akan disimpan dalam “/petshop/cat”, jenis peliharaan kura-kura akan disimpan dalam “/petshop/turtle”.
+```
+
+**c.** Setelah folder kategori berhasil dibuat, programmu akan memindahkan foto ke folder dengan kategori yang sesuai dan di rename dengan nama peliharaan.
+```Contoh: “/petshop/cat/joni.jpg”.```
+
+**d.** Karena dalam satu foto bisa terdapat lebih dari satu peliharaan maka foto harus di pindah ke masing-masing kategori yang sesuai. Contoh: foto dengan nama “dog;baro;1_cat;joni;2.jpg” dipindah ke folder “/petshop/cat/joni.jpg” dan “/petshop/dog/baro.jpg”.
+**e.** Di setiap folder buatlah sebuah file "keterangan.txt" yang berisi nama dan umur semua peliharaan dalam folder tersebut. Format harus sesuai contoh.
+```
+nama : joni
+umur  : 3 tahun
+
+nama : miko
+umur  : 2 tahun
+```
+### Jawaban 2A
+Soal 2A meminta kita untuk melakukan Unzip terhadap file petshop yang sudah didownload terlebihdahulu di modul soal.
+dalam soal ini file yang diunzip hanyalah file dengan format gambar atau ".jpg" dan untuk filefolder yang tidak penting tidak perlu di-unzip
+fungsi unzip:
+```c
+void unzipFile(char *pets){
+  pid_t pid;
+  pid = fork();
+  if(pid == 0){
+      char *args[] = {"unzip",  "-q", pets, "-d", FULL_PATH, NULL};
+      execv("/usr/bin/unzip", args);
+  }
+  while(wait(NULL)!=pid);
+}
+```
+fungsi menghapus file yang tidak perlu:
+```c
+void removeNotJpg(){
+   struct dirent *dp;
+   DIR *folder;
+   folder = opendir(FULL_PATH);
+
+    // printf("DEBUG removing %s\n", path);
+
+   if(folder != NULL){  //open dire"%s/%s", PETSHOP_PATH, jenis);ctory
+       while((dp = readdir(folder)) != NULL){  //read per names in the file
+            if(strcmp(dp->d_name, ".") != 0 && strcmp(dp->d_name, "..") != 0){ // dont copy parent and current directory
+                 if(dp->d_type == DT_DIR){
+                      char removePath[400];
+                      sprintf(removePath, "%s/%s", FULL_PATH, dp->d_name);
+
+                      pid_t pid;
+                      pid = fork();
+                      if(pid == 0){
+                         char *argv[] = {"rm", "-r", removePath, NULL};
+                         execv("/usr/bin/rm", argv);  
+                      }
+                      while(wait(NULL) != pid);
+                 }
+            }
+       }
+   }
+}
+```
+### Jawaban 2B
+Soal 2B menginginkan kita untuk membuat sebuah direktori baru dengan format penamaan disesuaikan untuk tiap nama hewan yang menjadi format penamaan file gambar setelah di-unzip. untuk nama tiap file direktori hanya dinamai nama depan tiap dari hewan 
+pembuatan sebah variabel yang berisi jenisnya:
+```c
+char *jenis = strtok(fileName, ";"),
+        *nama = strtok(NULL, ";"), 
+        *umur = strtok(NULL, ";");
+    printf("DEBUG NAMA FILE %s %s %s\n", jenis, umur, nama);
+
+    char jenisPath[400], txtPath[400], fileNamePath[400];
+    sprintf(jenisPath, "%s/%s", FULL_PATH, jenis);
+    sprintf(txtPath, "%s/%s/keterangan.txt", FULL_PATH, jenis);
+    sprintf(fileNamePath, "%s/%s/%s.jpg", FULL_PATH, jenis, nama);
+```
+exec untuk membuat kategori baru berdasarkan jenis:
+```c
+pid = fork();                                              
+    if(pid == 0) {
+        char *args[] = {"mkdir", "-p", jenisPath, NULL};
+        execv("/usr/bin/mkdir", args);
+    }
+    while(wait(NULL) != pid);
+```
+
+### Jawaban 2C
+Pada soal ini, dilakukan pembuatan program yang memilikii tujuan memindahkan file gambaar ke dalam direktori baru dari soal 2B yang disesuaikan berdasarkan nama jenisnya dan setelah dimasukkan ke file folder baru maka file gambarnya akan direname sesuai nama hewan per gambar
+exec untuk melakukan copy tiap gambar
+```c
+pid = fork();                                               
+    if(pid == 0) {
+        char *args[] = {"cp", sourcePath, fileNamePath, NULL};
+        execv("/usr/bin/cp", args);
+    }
+    while(wait(NULL) != pid);
+```
+setelah dicopy maka tidak ada file gambar yang ada di luar direktori maka akan dilakukan penghapusan gambar menggunakan:
+```c
+pid = fork();
+if(pid == 0){
+    char *argv[] = {"rm", "-rf", sourcePath, NULL};
+    execv("/usr/bin/rm", argv);   
+}
+while(wait(NULL) != pid);
+```
+### Jawaban 2D
+Pada soal ini berkaitan dengan jika didalam suatu file gambar terdapat 2 jenis dan nama hewan yang berbeda seperti contoh “dog;baro;1_cat;joni;2.jpg” maka pertama dilakukan pengecekan menggunakan strtok untuk menginisialisasi nama pertama lalu dilakukan inisialisasi lagi yang ke 2 untuk memindahkan file ke folder jenis yang lainnya
+menggunakan inisialisasi firstPet dan secondPet
+```c
+char *firstPet = strtok(fileName, "_");
+char *secondPet = strtok(NULL, "_");
+if(secondPet != NULL){                          
+    categorize(sourcePath, secondPet);
+}
+categorize(sourcePath,firstPet);
+```                    
+dalam hal hal ini, yang menjadi pemisah antara hewan pertama dan kedua adalah character "_".
+
+### Jawaban 2E
+pada soal ini diminta untuk membuat sebuah file.txt bernama Keterangan dimana didalamnya seperti yang diberikan oleh contoh soal
+```c
+char content[200];                                       
+    sprintf(content, "nama : %s \numur : %s\n\n", nama, umur);
+
+    FILE *ketTxt;
+    ketTxt = fopen(txtPath, "a");
+
+    if(ketTxt) {
+        fprintf(ketTxt, "%s", content);
+        fclose(ketTxt);
+    }
+ ```
 ## Soal Nomor 3
 Ranora adalah mahasiswa Teknik Informatika yang saat ini sedang menjalani magang di perusahan ternama yang bernama “FakeKos Corp.”, perusahaan yang bergerak dibidang keamanan data. Karena Ranora masih magang, maka beban tugasnya tidak sebesar beban tugas pekerja tetap perusahaan. Di hari pertama Ranora bekerja, pembimbing magang Ranora memberi tugas pertamanya untuk membuat sebuah program.
 
